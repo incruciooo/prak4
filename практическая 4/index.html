@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #00172d, #000c1f 70%, #002b55);
+            color: white;
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #timer {
+            font-size: 2rem;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            display: inline-block;
+            border: 2px solid #ffffff;
+            text-shadow: 0 0 10px #fff;
+        }
+
+        #snowflakes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        #interactive {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .tree {
+            position: relative;
+            width: 200px;
+            height: 300px;
+            margin: 20px auto;
+            background: linear-gradient(to bottom, #004d00, #007300);
+            clip-path: polygon(50% 0%, 10% 90%, 90% 90%);
+            box-shadow: 0 0 30px 15px #0f0;
+        }
+
+        .tree::after {
+            content: '';
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #ff0, #d9b200);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            box-shadow: 0 0 20px 10px yellow;
+        }
+
+        .lights {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .light {
+            width: 20px;
+            height: 20px;
+            margin: 5px;
+            border-radius: 50%;
+            background-color: yellow;
+            display: none;
+            box-shadow: 0 0 15px 10px yellow;
+        }
+
+        button {
+            background: #fa7070;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        button:hover {
+            background: #ff5a5a;
+        }
+
+        #goal {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>С Новым Годом!</h1>
+        <div id="timer"></div>
+    </header>
+
+    <div id="interactive">
+        <button id="toggleTree">Включить ёлку</button>
+        <div class="tree">
+            <div class="lights">
+                <div class="light"></div>
+                <div class="light"></div>
+                <div class="light"></div>
+                <div class="light"></div>
+                <div class="light"></div>
+                <div class="light"></div>
+                <div class="light"></div>
+                <div class="light"></div>
+                <div class="light"></div>
+                <div class="light"></div>
+            </div>
+        </div>
+        <button id="randomGoal">Получить цель</button>
+        <p id="goal"></p>
+    </div>
+
+    <canvas id="snowflakes"></canvas>
+
+    <script>
+        // Таймер до Нового года
+        function updateTimer() {
+            const now = new Date();
+            const nextYear = new Date(now.getFullYear() + 1, 0, 1);
+            const diff = nextYear - now;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('timer').innerText = `До нового года осталось: ${days} дней, ${hours} часов, ${minutes} минут, ${seconds} секунд.`;
+        }
+
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // Анимация падающих снежинок
+        const canvas = document.getElementById('snowflakes');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const snowflakes = [];
+
+        function createSnowflake() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 3 + 1,
+                speed: Math.random() * 2 + 1
+            };
+        }
+
+        for (let i = 0; i < 100; i++) {
+            snowflakes.push(createSnowflake());
+        }
+
+        function drawSnowflakes() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+
+            snowflakes.forEach(snowflake => {
+                ctx.beginPath();
+                ctx.arc(snowflake.x, snowflake.y, snowflake.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function updateSnowflakes() {
+            snowflakes.forEach(snowflake => {
+                snowflake.y += snowflake.speed;
+                if (snowflake.y > canvas.height) {
+                    snowflake.x = Math.random() * canvas.width;
+                    snowflake.y = 0;
+                }
+            });
+        }
+
+        function animateSnowflakes() {
+            updateSnowflakes();
+            drawSnowflakes();
+            requestAnimationFrame(animateSnowflakes);
+        }
+
+        animateSnowflakes();
+
+        // Интерактив - включение и выключение ёлки
+        const toggleTreeBtn = document.getElementById('toggleTree');
+        const lights = document.querySelectorAll('.light');
+
+        toggleTreeBtn.addEventListener('click', () => {
+            lights.forEach(light => {
+                light.style.display = light.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+
+        // Рандомные цели
+        const goals = [
+            'Прочитать 12 книг',
+            'Научиться готовить 5 новых блюд',
+            'Пробежать марафон',
+            'Сделать ремонт в квартире',
+            'Выучить новый язык',
+            'Посетить 3 новых страны',
+            'Сэкономить на крупную покупку',
+            'Начать вести дневник',
+            'Освоить новый навык',
+            'Познакомиться с 10 новыми людьми'
+        ];
+
+        const randomGoalBtn = document.getElementById('randomGoal');
+        const goalText = document.getElementById('goal');
+
+        randomGoalBtn.addEventListener('click', () => {
+            const randomIndex = Math.floor(Math.random() * goals.length);
+            goalText.textContent = goals[randomIndex];
+        });
+    </script>
+</body>
+</html>
